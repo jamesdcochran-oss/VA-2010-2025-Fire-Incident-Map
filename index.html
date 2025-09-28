@@ -1,0 +1,181 @@
+<!-- index.html (single-file, inline full historical GeoJSON) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Virginia Fire Incidents — Oct–Dec (Historical)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Interactive heat map and clustered markers of Virginia fire incidents (historical), focusing on October–December." />
+  <style>
+    html, body { height: 100%; margin: 0; }
+    #map { position: absolute; inset: 0; }
+    .ctl { background:#fff; border-radius:8px; padding:10px; margin:10px;
+           box-shadow:0 1px 5px rgba(0,0,0,.25); font:14px/1.2 system-ui,Segoe UI,Roboto,Arial,sans-serif; }
+    .ctl h4 { margin:0 0 6px 0; font-size:16px; }
+    .legend-row { display:flex; align-items:center; gap:8px; margin:6px 0; }
+    .legend-dot { display:inline-block; border-radius:50%; border:1px solid #8b0000; background:rgba(255,0,0,.45); }
+    .heatbar { width:140px; height:10px; background:linear-gradient(90deg, blue, lime, yellow, red); border:1px solid #999; border-radius:10px; }
+    .legend-scale { font-size:12px; display:flex; justify-content:space-between; }
+    .filters { display:flex; gap:8px; align-items:center; flex-wrap: wrap; }
+    .filters select, .filters button { padding:4px 8px; }
+    .filters label { display:flex; gap:6px; align-items:center; }
+    .pill { background:#f5f5f5; border:1px solid #ddd; border-radius:999px; padding:2px 8px; }
+    .notice { color:#b94a48; }
+    .btn { background:#0d6efd; color:#fff; border:none; border-radius:8px; padding:6px 10px; cursor:pointer; }
+    .btn.alt { background:#6c757d; }
+    .btn:disabled { opacity:0.6; cursor:not-allowed; }
+    #errbox { position: fixed; top: 8px; right: 8px; z-index: 9999; max-width: 46ch;
+              background:#ffecec; color:#b94a48; border:1px solid #f5c2c7; padding:8px 10px; border-radius:8px;
+              white-space:pre-wrap; font:13px/1.3 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; display:none; }
+  </style>
+
+  <!-- Leaflet + plugins -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+</head>
+<body>
+  <div id="map" role="region" aria-label="Virginia Fire Incident Heat Map"></div>
+  <div id="errbox"></div>
+
+  <!-- ✅ VALID inline GeoJSON (full dataset; no comments, no trailing commas) -->
+  <script id="incidents-geojson" type="application/json">{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"id":"CHP24002","date":"2024-12-29 14:30","acres":5.0,"cause":"Miscellaneous","county":"Chesapeake City","region":"Eastern Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-76.3472222222,36.7641666667]}},{"type":"Feature","properties":{"id":"CHP24001","date":"2024-12-29 14:03","acres":1.3,"cause":"Miscellaneous","county":"Chesapeake City","region":"Eastern Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-76.3575,36.7527777778]}},{"type":"Feature","properties":{"id":"CHP24000","date":"2024-12-29 13:20","acres":3.0,"cause":"Miscellaneous","county":"Chesapeake City","region":"Eastern Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-76.2852777778,36.7833333333]}},{"type":"Feature","properties":{"id":"CHP23999","date":"2024-12-29 12:11","acres":2.0,"cause":"Miscellaneous","county":"Chesapeake City","region":"Eastern Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-76.3644444444,36.8266666667]}},{"type":"Feature","properties":{"id":"CHP23998","date":"2024-12-29 11:21","acres":0.1,"cause":"Miscellaneous","county":"Chesapeake City","region":"Eastern Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-76.2816666667,36.8236111111]}},{"type":"Feature","properties":{"id":"CHP23997","date":"2024-12-29 10:40","acres":0.1,"cause":"Miscellaneous","county":"Chesapeake City","region":"Eastern Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-76.3380555556,36.8308333333]}},{"type":"Feature","properties":{"id":"CHP23996","date":"2024-12-29 10:20","acres":0.1,"cause":"Miscellaneous","county":"Chesapeake City","region":"Eastern Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-76.3358333333,36.8272222222]}},{"type":"Feature","properties":{"id":"CHP23995","date":"2024-12-29 10:00","acres":0.1,"cause":"Miscellaneous","county":"Chesapeake City","region":"Eastern Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-76.3275,36.8238888889]}},{"type":"Feature","properties":{"id":"CHP23994","date":"2024-12-29 09:40","acres":0.1,"cause":"Miscellaneous","county":"Chesapeake City","region":"Eastern Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-76.3086111111,36.8305555556]}},{"type":"Feature","properties":{"id":"CHP23993","date":"2024-12-29 09:10","acres":0.1,"cause":"Miscellaneous","county":"Chesapeake City","region":"Eastern Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-76.3180555556,36.8130555556]}},{"type":"Feature","properties":{"id":"RKH24022","date":"2024-12-27 08:00","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Woodstove Ashes"},"geometry":{"type":"Point","coordinates":[-78.9013888889,38.5319444444]}},{"type":"Feature","properties":{"id":"RKH24021","date":"2024-12-26 12:50","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.7665972222,38.3921972222]}},{"type":"Feature","properties":{"id":"RKH24020","date":"2024-12-26 10:15","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.7063944444,38.3508]}},{"type":"Feature","properties":{"id":"RKH24019","date":"2024-12-23 13:44","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.68685,38.45235]}},{"type":"Feature","properties":{"id":"RKH24018","date":"2024-12-23 10:30","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.8325527778,38.3661083333]}},{"type":"Feature","properties":{"id":"RKH24017","date":"2024-12-23 09:52","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.9083111111,38.4286027778]}},{"type":"Feature","properties":{"id":"RKH24016","date":"2024-12-23 09:20","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.6580861111,38.3913722222]}},{"type":"Feature","properties":{"id":"RKH24015","date":"2024-12-23 08:29","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.7031944444,38.2385277778]}},{"type":"Feature","properties":{"id":"RKH24014","date":"2024-12-22 15:31","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.9101138889,38.5014083333]}},{"type":"Feature","properties":{"id":"RKH24013","date":"2024-12-21 15:17","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.747525,38.4511472222]}},{"type":"Feature","properties":{"id":"RKH24012","date":"2024-12-20 10:53","acres":0.2,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.6675472222,38.4479527778]}},{"type":"Feature","properties":{"id":"RKH24011","date":"2024-12-19 13:46","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.7358861111,38.5990833333]}},{"type":"Feature","properties":{"id":"RKH24010","date":"2024-12-19 10:45","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.6655833333,38.3385222222]}},{"type":"Feature","properties":{"id":"RKH24009","date":"2024-12-18 15:59","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.5467916667,38.2753916667]}},{"type":"Feature","properties":{"id":"RKH24008","date":"2024-12-18 15:48","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.89225,38.4160361111]}},{"type":"Feature","properties":{"id":"RKH24007","date":"2024-12-18 14:45","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.9021722222,38.4463333333]}},{"type":"Feature","properties":{"id":"RKH24006","date":"2024-12-18 14:06","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.6189333333,38.463875]}},{"type":"Feature","properties":{"id":"RKH24005","date":"2024-12-18 13:32","acres":0.3,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.5263527778,38.2799083333]}},{"type":"Feature","properties":{"id":"RKH24004","date":"2024-12-18 13:00","acres":0.2,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.5262333333,38.27615]}},{"type":"Feature","properties":{"id":"RKH24003","date":"2024-12-18 12:50","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.7833111111,38.4933333333]}},{"type":"Feature","properties":{"id":"RKH24002","date":"2024-12-18 12:33","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.5178527778,38.2780361111]}},{"type":"Feature","properties":{"id":"RKH24001","date":"2024-12-18 10:38","acres":0.1,"cause":"Miscellaneous","county":"Rockingham","region":"Central Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-78.67105,38.4001611111]}},{"type":"Feature","properties":{"id":"SHP24002","date":"2024-12-05 13:13","acres":29.0,"cause":"Miscellaneous","county":"Southampton","region":"Eastern Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-76.999722,36.751389]}},{"type":"Feature","properties":{"id":"SUF24002","date":"2024-12-05 12:15","acres":42.0,"cause":"Miscellaneous","county":"Suffolk","region":"Eastern Region","specific":"Powerlines"},"geometry":{"type":"Point","coordinates":[-76.771667,36.604722]}},{"type":"Feature","properties":{"id":"RKH20008","date":"2020-10-04 11:40","acres":3.0,"cause":"Equipment Use","county":"Rockingham","region":"Central Region","specific":"Direct Heat Transfer"},"geometry":{"type":"Point","coordinates":[-78.6597222222,38.4255555556]}}]}</script>
+
+  <script>
+    /* ---------- error surface (so you never get a blank page) ---------- */
+    function showErr(msg){const b=document.getElementById('errbox');b.textContent=String(msg);b.style.display='block';}
+    window.addEventListener('error',e=>showErr(`${e.message}\n${e.filename}:${e.lineno}:${e.colno}`));
+
+    /* ---------- parse GeoJSON safely ---------- */
+    let gj;
+    try {
+      gj = JSON.parse(document.getElementById('incidents-geojson').textContent);
+    } catch (err) {
+      showErr('GeoJSON parse error: ' + err.message + '\nTip: JSON must not contain comments or trailing commas.');
+      throw err;
+    }
+
+    /* ---------- helpers ---------- */
+    function parseDateLocal(s){ if(!s) return null; const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/); if(m) return new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]); const d=new Date(String(s).replace(' ','T')); return isNaN(d)?null:d; }
+    function monthFromRecord(r){ if(r.when && !isNaN(r.when)) return r.when.getMonth(); const m=String(r.date||'').match(/^\d{4}-(\d{2})/); return m?(+m[1]-1):-1; }
+    function toRows(geojson){
+      if(!geojson||!geojson.features) return [];
+      return geojson.features.filter(f=>f&&f.geometry&&Array.isArray(f.geometry.coordinates)).map(f=>{
+        const p=f.properties||{}; const [lng,lat]=f.geometry.coordinates;
+        return { id:p.id, date:p.date, when:parseDateLocal(p.date), acres:Math.max(0,Number(p.acres)||0),
+          cause:p.cause||'Unknown', county:p.county||'', region:p.region||'', specific:p.specific||'',
+          lat:Number(lat), lng:Number(lng) };
+      }).filter(r=>Number.isFinite(r.lat)&&Number.isFinite(r.lng));
+    }
+    const rows=toRows(gj);
+    const maxAcres=rows.reduce((m,r)=>Math.max(m,r.acres),0.0001);
+
+    /* ---------- define BEFORE legend uses it ---------- */
+    function getRadius(acres){ return Math.max(3, Math.log(acres + 1) * 6 + 3); } /* tiny fires still visible */
+
+    /* ---------- map ---------- */
+    const map=L.map('map',{center:[37.76,-78.49],zoom:7,zoomControl:true,preferCanvas:false});
+    const base={
+      'OpenStreetMap': L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19}).addTo(map),
+      'USGS Topo': L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}',{attribution:'Tiles © USGS',maxZoom:18}),
+      'USGS Imagery': L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}',{attribution:'Tiles © USGS',maxZoom:18}),
+      'USGS Hydrography': L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSHydroCached/MapServer/tile/{z}/{y}/{x}',{attribution:'Tiles © USGS',maxZoom:18}),
+      'USGS Shaded Relief': L.tileLayer('https://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer/tile/{z}/{y}/{x}',{attribution:'Tiles © USGS',maxZoom:18})
+    };
+    L.control.scale({imperial:true,metric:false}).addTo(map);
+
+    /* ---------- overlays ---------- */
+    const proportionalLayer=L.layerGroup().addTo(map);
+    const clusterLayer=L.markerClusterGroup().addTo(map);
+    const heatLayer=L.heatLayer([], {radius:25,minOpacity:0.5,gradient:{0.0:'blue',0.5:'lime',0.8:'yellow',1.0:'red'}}).addTo(map);
+    const overlays={'Proportional Circles':proportionalLayer,'Incident Pins (Cluster)':clusterLayer,'Acreage Heat Map':heatLayer};
+    L.control.layers(base,overlays,{collapsed:false}).addTo(map);
+
+    /* ---------- controls ---------- */
+    const TitleCtl=L.Control.extend({options:{position:'topleft'},onAdd(){const e=L.DomUtil.create('div','ctl');e.innerHTML='<h4>🔥 Virginia Fire Incidents</h4><small><span id="count">0</span> record(s). Marker size ∝ acres.</small>';return e;}});
+    map.addControl(new TitleCtl());
+    function setCount(n){const e=document.getElementById('count'); if(e) e.textContent=String(n);}
+
+    const LegendCtl=L.Control.extend({options:{position:'bottomleft'},onAdd(){const e=L.DomUtil.create('div','ctl');const sizes=[0.1,1,5,15];
+      e.innerHTML=`<div><b>Proportional Circles</b></div>${
+        sizes.map(a=>`<div class="legend-row"><span class="legend-dot" style="width:${getRadius(a)*2}px;height:${getRadius(a)*2}px"></span><span>${a} acres</span></div>`).join('')
+      }<hr/><div><b>Heat Intensity</b></div><div class="heatbar" title="Low → High"></div><div class="legend-scale"><span>Low</span><span>High</span></div>`;
+      return e; }});
+    map.addControl(new LegendCtl());
+
+    const years=['All',...Array.from(new Set(rows.map(r=>r.when&&!isNaN(r.when)?r.when.getFullYear():String(r.date).slice(0,4)))).filter(Boolean).sort()];
+    const causes=['All',...Array.from(new Set(rows.map(r=>r.cause))).sort()];
+    const FilterCtl=L.Control.extend({options:{position:'topright'},onAdd(){const e=L.DomUtil.create('div','ctl');e.innerHTML=`
+      <div class="filters">
+        <span class="pill"><label><b>Year</b><select id="yearSel">${years.map(y=>`<option>${y}</option>`).join('')}</select></label></span>
+        <span class="pill"><label><b>Cause</b><select id="causeSel">${causes.map(c=>`<option>${c}</option>`).join('')}</select></label></span>
+        <span class="pill"><label title="Limit to October–December"><input type="checkbox" id="octDecOnly" checked /><b>Oct–Dec</b></label></span>
+        <button id="exportGeo" class="btn" title="Download current selection as GeoJSON">Export GeoJSON</button>
+        <button id="exportCsv" class="btn alt" title="Download current selection as CSV">Export CSV</button>
+        <button id="resetBtn" class="pill" title="Reset all filters">Reset</button>
+      </div>`; L.DomEvent.disableClickPropagation(e); return e;}});
+    map.addControl(new FilterCtl());
+
+    const NoticeCtl=L.Control.extend({options:{position:'bottomright'},onAdd(){const e=L.DomUtil.create('div','ctl notice');e.id='noResults';e.style.display='none';e.textContent='No records match the current filters.';L.DomEvent.disableClickPropagation(e);return e;}});
+    map.addControl(new NoticeCtl());
+    function showNoResults(show){const e=document.getElementById('noResults'); if(e) e.style.display=show?'block':'none';}
+
+    /* ---------- behavior ---------- */
+    function popupHtml(f){return `<div>
+      <strong>Fire #:</strong> ${f.id}<br/>
+      <strong>Date:</strong> ${f.date}<br/>
+      <strong>Acres:</strong> ${f.acres}<br/>
+      <strong>Cause:</strong> ${f.cause}<br/>
+      <strong>County:</strong> ${f.county}<br/>
+      <strong>Region:</strong> ${f.region}<br/>
+      <strong>Specific:</strong> ${f.specific}
+    </div>`;}
+
+    let currentFiltered=[];
+    function applyFilters(){
+      const ySel=document.getElementById('yearSel'), cSel=document.getElementById('causeSel'), octDec=document.getElementById('octDecOnly');
+      const yearVal=ySel?ySel.value:'All', causeVal=cSel?cSel.value:'All', restrict=octDec?octDec.checked:true;
+      currentFiltered = rows.filter(r=>{
+        const m=monthFromRecord(r);
+        const inMonths=!restrict||(m===9||m===10||m===11); /* Oct/Nov/Dec */
+        const yearOk=(yearVal==='All')||(r.when&&r.when.getFullYear()===Number(yearVal))||(String(r.date).startsWith(String(yearVal)));
+        const causeOk=(causeVal==='All')||(r.cause===causeVal);
+        return inMonths&&yearOk&&causeOk;
+      });
+      rebuildLayers(currentFiltered); fitToData(currentFiltered); setCount(currentFiltered.length); showNoResults(currentFiltered.length===0); setExportButtonsEnabled(currentFiltered.length>0);
+    }
+
+    function rebuildLayers(data){
+      proportionalLayer.clearLayers(); clusterLayer.clearLayers();
+      data.forEach(f=>{
+        L.circleMarker([f.lat,f.lng],{radius:getRadius(f.acres),color:'darkred',fillColor:'red',fillOpacity:0.5,weight:1.5}).bindPopup(popupHtml(f)).addTo(proportionalLayer);
+        L.marker([f.lat,f.lng]).bindPopup(popupHtml(f)).addTo(clusterLayer);
+      });
+      heatLayer.setLatLngs(data.map(f=>[f.lat,f.lng,f.acres/maxAcres]));
+    }
+
+    function fitToData(data){ if(!data.length) return; map.fitBounds(L.latLngBounds(data.map(d=>[d.lat,d.lng])).pad(0.2)); }
+
+    /* ---------- export ---------- */
+    function setExportButtonsEnabled(on){ const g=document.getElementById('exportGeo'), c=document.getElementById('exportCsv'); if(g) g.disabled=!on; if(c) c.disabled=!on; }
+    function filteredToGeoJSON(){ return {type:'FeatureCollection',features:currentFiltered.map(r=>({type:'Feature',properties:{id:r.id,date:r.date,acres:r.acres,cause:r.cause,county:r.county,region:r.region,specific:r.specific},geometry:{type:'Point',coordinates:[r.lng,r.lat]}}))}; }
+    function filteredToCSV(){ const cols=['id','date','acres','cause','county','region','specific','lat','lng']; const esc=v=>{const s=String(v??''); return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;}; return [cols.join(',')].concat(currentFiltered.map(r=>cols.map(k=>esc(r[k])).join(','))).join('\n'); }
+    function download(filename,mime,text){ const blob=new Blob([text],{type:mime}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); URL.revokeObjectURL(url); a.remove(); }
+
+    /* ---------- init + hooks ---------- */
+    applyFilters();
+    L.Control.geocoder({defaultMarkGeocode:false,collapsed:false,placeholder:'Search streets / places...'}).on('markgeocode',e=>map.fitBounds(e.geocode.bbox)).addTo(map);
+    document.addEventListener('change',e=>{ if(e.target&&(e.target.id==='yearSel'||e.target.id==='causeSel'||e.target.id==='octDecOnly')) applyFilters(); });
+    document.addEventListener('click',e=>{ if(!e.target) return;
+      if(e.target.id==='resetBtn'){ const ySel=document.getElementById('yearSel'), cSel=document.getElementById('causeSel'), od=document.getElementById('octDecOnly'); if(ySel) ySel.value='All'; if(cSel) cSel.value='All'; if(od) od.checked=true; applyFilters(); }
+      if(e.target.id==='exportGeo'){ download('va-fires-oct-dec.geojson','application/geo+json;charset=utf-8', JSON.stringify(filteredToGeoJSON(),null,2)); }
+      if(e.target.id==='exportCsv'){ download('va-fires-oct-dec.csv','text/csv;charset=utf-8', filteredToCSV()); }
+    });
+  </script>
+</body>
+</html>
