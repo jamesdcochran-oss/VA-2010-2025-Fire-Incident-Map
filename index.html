@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+              initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_8c29f2e5343dc11a1b1ba6ea5c0270ea {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/leaflet.markercluster.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.1.0/MarkerCluster.Default.css"/>
+    <script src="https://cdn.jsdelivr.net/gh/python-visualization/folium@master/folium/templates/leaflet_heat.min.js"></script>
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_8c29f2e5343dc11a1b1ba6ea5c0270ea" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_8c29f2e5343dc11a1b1ba6ea5c0270ea = L.map(
+                "map_8c29f2e5343dc11a1b1ba6ea5c0270ea",
+                {
+                    center: [37.5, -78.8],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 7,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_78638efff62b776d3ef0533ff7769415 = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_8c29f2e5343dc11a1b1ba6ea5c0270ea);
+        
+    
+            var tile_layer_9910bd4889ba0d0b15f56dafe13fbff7 = L.tileLayer(
+                "https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}",
+                {"attribution": "USGS The National Map: USGSTopo", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_8c29f2e5343dc11a1b1ba6ea5c0270ea);
+        
+    
+            var tile_layer_8f8ab9ef1462f95848fcd5eca0c512b4 = L.tileLayer(
+                "https://basemap.nationalmap.gov/arcgis/rest/services/USGSShadedReliefOnly/MapServer/tile/{z}/{y}/{x}",
+                {"attribution": "USGS The National Map: Shaded Relief", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_8c29f2e5343dc11a1b1ba6ea5c0270ea);
+        
+    
+            var tile_layer_b8f746fb08a5bd91ecb6161c9606a9b2 = L.tileLayer(
+                "https://basemap.nationalmap.gov/arcgis/rest/services/USGSImageryOnly/MapServer/tile/{z}/{y}/{x}",
+                {"attribution": "USGS The National Map: Imagery", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_8c29f2e5343dc11a1b1ba6ea5c0270ea);
+        
+    
+            var feature_group_ce9e715768f76613c8871d35f406d13c = L.featureGroup(
+                {}
+            ).addTo(map_8c29f2e5343dc11a1b1ba6ea5c0270ea);
+        
+    
+            var marker_cluster_90a296f51a30793a1a6a2c055b0bd52b = L.markerClusterGroup(
+                {}
+            );
+            feature_group_ce9e715768f76613c8871d35f406d13c.addLayer(marker_cluster_90a296f51a30793a1a6a2c055b0bd52b);
+        
+    
+            var circle_marker_1d7d3de8121808cd07c376d12e44f1ac = L.circleMarker(
+                [36.7641666666667, -76.3472222222222],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 3}
+            ).addTo(marker_cluster_90a296f51a30793a1a6a2c055b0bd52b);
+        
+    
+        var popup_769637f8cef6f48deb303861ac2a0d6d = L.popup({"maxWidth": 280});
+
+        
+            var html_a0626dff38d8a44f98806254386838fb = $(`<div id="html_a0626dff38d8a44f98806254386838fb" style="width: 100.0%; height: 100.0%;"><b>Fire #:</b> CHP24002<br><b>Date:</b> 2024-12-29 14:30<br><b>County:</b> Chesapeake City &nbsp; <b>Region:</b> Eastern Region                <br><b>Acres:</b> 5.0<br><b>Cause:</b> Miscellaneous<br><b>Specific:</b> Powerlines</div>`)[0];
+            popup_769637f8cef6f48deb303861ac2a0d6d.setContent(html_a0626dff38d8a44f98806254386838fb);
+        
+
+        circle_marker_1d7d3de8121808cd07c376d12e44f1ac.bindPopup(popup_769637f8cef6f48deb303861ac2a0d6d)
+        ;
+
+        
+    
+    
+            var circle_marker_0854b8a8f9e7f6b3333932a406a73687 = L.circleMarker(
+                [38.5319444444444, -78.9013888888889],
+                {"bubblingMouseEvents": true, "color": "#3388ff", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "#3388ff", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 3, "stroke": true, "weight": 3}
+            ).addTo(marker_cluster_90a296f51a30793a1a6a2c055b0bd52b);
+        
+    
+        var popup_d0abfcedf93f5a8c578a716a9667ca12 = L.popup({"maxWidth": 280});
+
+        
+            var html_9130960e4ac01128bfbfe17328517692 = $(`<div id="html_9130960e4ac01128bfbfe17328517692" style="width: 100.0%; height: 100.0%;"><b>Fire #:</b> RKH24022<br><b>Date:</b> 2024-12-27 08:00<br><b>County:</b> Rockingham &nbsp; <b>Region:</b> Central Region                <br><b>Acres:</b> 0.4<br><b>Cause:</b> Miscellaneous<br><b>Specific:</b> Woodstove Ashes</div>`)[0];
+            popup_d0abfcedf93f5a8c578a716a9667ca12.setContent(html_9130960e4ac01128bfbfe17328517692);
+        
+
+        circle_marker_0854b8a8f9e7f6b3333932a406a73687.bindPopup(popup_d0abfcedf93f5a8c578a716a9667ca12)
+        ;
+        
+        // ... (the rest of your file's content) ...
+
+        L.control.layers(
+            layer_control_c1dc0b28f29c2255b4551fbbd528f709.base_layers,
+            layer_control_c1dc0b28f29c2255b4551fbbd528f709.overlays,
+            {"autoZIndex": true, "collapsed": false, "position": "topright"}
+        ).addTo(map_8c29f2e5343dc11a1b1ba6ea5c0270ea);
+        tile_layer_9910bd4889ba0d0b15f56dafe13fbff7.remove();
+        tile_layer_8f8ab9ef1462f95848fcd5eca0c512b4.remove();
+        tile_layer_b8f746fb08a5bd91ecb6161c9606a9b2.remove();
+        feature_group_62e49681b864e5ab71e89d2c98f98aa3.remove();
+    
+</script>
+</html>
